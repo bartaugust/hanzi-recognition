@@ -1,0 +1,11 @@
+{
+  "logging":
+  {
+    "level": "INFO"
+  },
+  "paths":
+  {
+    "data": "data/",
+    "tests" : "tests"
+  }
+}
