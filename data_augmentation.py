@@ -13,3 +13,8 @@ data_augmentation = tf.keras.Sequential([
     layers.RandomRotation(0.2),
 
 ])
+
+preprocessing = tf.keras.Sequential([
+    resize_and_rescale,
+    data_augmentation
+])

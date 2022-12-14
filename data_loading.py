@@ -28,4 +28,4 @@ def load_images_from_dataframe(df,data_type):
 test_df = create_dataframe_from_files(IMAGE_PATH+paths["test_data"])
 train_df = create_dataframe_from_files(IMAGE_PATH+paths["train_data"])
 
-# labels, images = load_images_from_dataframe(test_df,"test_data")
+labels, images = load_images_from_dataframe(test_df,"test_data")

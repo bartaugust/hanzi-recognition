@@ -9,11 +9,22 @@
     "or_train_data": "CASIA-HWDB_Train/Train/",
     "test_data": "CASIA-HWDB_Test/new_Test/",
     "train_data": "CASIA-HWDB_Train/new_Train/",
-    "tests" : "tests/"
+    "tests" : "tests/",
+    "models": "models/"
   },
   "image_params":
   {
-    "height": 224,
-    "width": 224
+    "height": 96,
+    "width": 96
+  },
+  "model":
+  {
+    "es_patience": 50,
+    "es_min_delta":0.0001,
+
+    "optimizer": "adam",
+    "metrics": ["accuracy"],
+
+    "epochs": 5
   }
 }
