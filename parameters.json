@@ -10,5 +10,10 @@
     "test_data": "CASIA-HWDB_Test/new_Test/",
     "train_data": "CASIA-HWDB_Train/new_Train/",
     "tests" : "tests/"
+  },
+  "image_params":
+  {
+    "height": 224,
+    "width": 224
   }
 }
