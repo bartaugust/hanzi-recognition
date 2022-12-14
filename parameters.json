@@ -5,7 +5,10 @@
   },
   "paths":
   {
-    "data": "data/",
-    "tests" : "tests"
+    "or_test_data": "CASIA-HWDB_Test/Test/",
+    "or_train_data": "CASIA-HWDB_Train/Train/",
+    "test_data": "CASIA-HWDB_Test/new_Test/",
+    "train_data": "CASIA-HWDB_Train/new_Train/",
+    "tests" : "tests/"
   }
 }

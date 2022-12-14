@@ -6,6 +6,7 @@ import logging
 load_dotenv()
 
 PROJECT_PATH = os.getenv('PROJECT_PATH')
+IMAGE_PATH = os.getenv('IMAGE_PATH')
 
 with open(PROJECT_PATH + 'parameters.json') as f:
     parameters = json.load(f)
