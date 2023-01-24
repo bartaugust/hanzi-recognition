@@ -1,13 +1,15 @@
 import logging
 
-import numpy as np
+from keras.preprocessing.image import ImageDataGenerator
+from keras import layers
+from keras.utils import Sequence
 
 from imports import *
 
 import pandas as pd
 import cv2
 
-from keras import layers
+
 def remove_symbols(df):
     return df.drop(df.index[10:])
 
@@ -35,7 +37,7 @@ def load_images_from_dataframe(df, data_type):
         logging.debug(f'loaded images {len(image_list)}/{len(image_paths)}')
         logging.debug(f'loaded {image_path}')
     logging.info(f'loaded all {data_type}')
-    return label_list, np.array(image_list).astype(np.float32)/255
+    return label_list, np.array(image_list).astype(np.float32) / 255
 
 
 def save_images_to_npy():
@@ -48,15 +50,51 @@ def save_images_to_npy():
 
 
 def load_from_npy():
-    labels = np.load('labels.npy',allow_pickle=True)
+    labels = np.load('labels.npy', allow_pickle=True)
     images = np.load('images.npy')
     return labels, images
 
 
+# Generator
+
+train_datagen = ImageDataGenerator(
+    rescale=1. / 255,
+    shear_range=0.2,
+    zoom_range=0.2)
+
+test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+train_generator = train_datagen.flow_from_directory(
+    IMAGE_PATH + 'CASIA-HWDB_Train/Train',
+    target_size=(parameters['image_params']['width'],parameters['image_params']['height']),
+    batch_size=32,
+    class_mode='binary')
+
+validation_generator = test_datagen.flow_from_directory(
+    IMAGE_PATH +'CASIA-HWDB_Test/Test',
+    target_size=(parameters['image_params']['width'],parameters['image_params']['height']),
+    batch_size=32,
+    class_mode='binary')
+
+# class HanziDataset(Sequence):
+#     def __init__(self, list_IDs, labels, image_path, mask_path,
+#                  to_fit=True, batch_size=32, dim=(256, 256),
+#                  n_channels=1, n_classes=10, shuffle=True):
+#         self.list_IDs = list_IDs
+#         self.labels = labels
+#         self.image_path = image_path
+#         self.mask_path = mask_path
+#         self.to_fit = to_fit
+#         self.batch_size = batch_size
+#         self.dim = dim
+#         self.n_channels = n_channels
+#         self.n_classes = n_classes
+#         self.shuffle = shuffle
+#         self.on_epoch_end()
+
 
 # save_images_to_npy()
-labels, images = load_from_npy()
-vocab = np.unique(labels)
-vocab_layer = layers.StringLookup(vocabulary=vocab)
-
-
+if __name__ == '__main__':
+    labels, images = load_from_npy()
+    vocab = np.unique(labels)
+    vocab_layer = layers.StringLookup(vocabulary=vocab)
