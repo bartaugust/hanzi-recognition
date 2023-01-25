@@ -8,7 +8,7 @@ import tensorflow as tf
 from keras import layers, models
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
-from all_models import base_models
+from all_models import ModelTemplate
 from data_loading import vocab_layer, labels, images
 
 
