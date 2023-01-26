@@ -9,7 +9,7 @@ from keras import layers, models
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 from all_models import ModelTemplate
-from data_loading import vocab_layer, labels, images
+# from data_loading import train_generator
 
 
 
@@ -28,7 +28,7 @@ def train_model(model, model_name, train_ds):
     # print(model.summary())
     history = model.fit(
         train_ds,
-        vocab_layer(labels)-1,
+        # vocab_layer(labels)-1,
         validation_split=0.2,
         epochs=parameters["model"]["epochs"],
         batch_size=parameters["model"]["batch_size"],
@@ -48,4 +48,4 @@ def load_model(model_name, nr=-1):
         logging.exception('')
 
 
-train_model(base_models['high_performance_cnn'], 'high_performance_cnn', images)
+train_model(base_models['high_performance_cnn'], 'high_performance_cnn', train_generator)

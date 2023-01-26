@@ -5,9 +5,14 @@ import logging
 import numpy as np
 import tensorflow as tf
 
-# physical_devices = tf.config.list_physical_devices('GPU')
+# from tensorflow.keras import mixed_precision
+# mixed_precision.set_global_policy('mixed_float16')
+
+physical_devices = tf.config.list_physical_devices('GPU')
+logging.info(physical_devices)
 # tf.config.experimental.set_memory_growth(physical_devices[0], True)
 # os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 load_dotenv()
 
@@ -19,3 +24,6 @@ with open(PROJECT_PATH + 'parameters.json') as f:
     paths = parameters['paths']
 
 logging.getLogger().setLevel(parameters['logging']['level'])
+
+# tf.keras.backend.clear_session()
+# tf.config.optimizer.set_jit(False)

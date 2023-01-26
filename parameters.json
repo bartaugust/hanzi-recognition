@@ -1,31 +1,28 @@
 {
-  "logging":
-  {
-    "level": "DEBUG"
+  "logging": {
+    "level": "INFO"
   },
-  "paths":
-  {
-    "or_test_data": "CASIA-HWDB_Test/Test/",
-    "or_train_data": "CASIA-HWDB_Train/Train/",
-    "test_data": "CASIA-HWDB_Test/new_Test/",
-    "train_data": "CASIA-HWDB_Train/new_Train/",
-    "tests" : "tests/",
+  "paths": {
+    "or_test": "CASIA-HWDB_Test/Test/",
+    "or_train": "CASIA-HWDB_Train/Train/",
+    "train": "CASIA-HWDB_Test/cut_Test/",
+    "test": "CASIA-HWDB_Train/cut_Train/",
+    "tests": "tests/",
     "models": "models/"
   },
-  "image_params":
-  {
-    "height": 96,
-    "width": 96
+  "image_params": {
+    "height": 16,
+    "width": 16
   },
-  "model":
-  {
-    "es_patience": 50,
-    "es_min_delta":0.0001,
-
+  "model": {
+    "es_patience": 5,
+    "es_min_delta": 0.0001,
     "optimizer": "adam",
-    "metrics": ["accuracy"],
-
-    "epochs": 5,
-    "batch_size": 16
+    "metrics": [
+      "accuracy"
+    ],
+    "epochs": 100,
+    "batch_size": 128
   }
+
 }

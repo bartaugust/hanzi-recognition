@@ -1,8 +1,10 @@
 import logging
+import os
 
 from keras.preprocessing.image import ImageDataGenerator
 from keras import layers
-from keras.utils import Sequence
+from tensorflow.keras.utils import Sequence
+# import tfds
 
 from imports import *
 
@@ -13,7 +15,23 @@ import cv2
 # Generator
 class DataLoading:
     def __init__(self):
-        self.dataframe = pd.DataFrame({})
+        self.train_generator = None
+        self.val_generator = None
+        self.test_generator = None
+        self.train_ds = None
+        self.val_ds = None
+        self.test_ds = None
+        self.df = None
+        self.config = {
+            'train': {
+                'rescale': 1. / 255,
+                # 'shear_range': 0.2,
+                # 'zoom_range': 0.2,
+                'validation_split': 0.2
+            },
+            'test': {
+                "rescale": 1. / 255
+            }}
 
     def remove_symbols(self):
         self.df.drop(self.df.index[10:], inplace=True)
@@ -26,6 +44,7 @@ class DataLoading:
         self.remove_symbols()
         self.df = self.df.explode('Image').sample(frac=1).reset_index(drop=True)
         logging.debug('created dataframe')
+        print('a')
 
     def load_images_from_dataframe(self, data_type):
         image_list = []
@@ -45,7 +64,7 @@ class DataLoading:
         # test_df = create_dataframe_from_files(IMAGE_PATH+paths["test_data"])
         train_df = self.create_dataframe_from_files(IMAGE_PATH + paths["train_data"])
 
-        labels, images = self.load_images_from_dataframe(train_df, "train_data")
+        labels, images = self.load_images_from_dataframe("train_data")
         np.save('labels.npy', labels)
         np.save('images.npy', images)
 
@@ -54,67 +73,76 @@ class DataLoading:
         images = np.load('images.npy')
         return labels, images
 
-    def create_generator(self, dataset):
-        config_train = {
-            'rescale': 1. / 255,
-            'shear_range': 0.2,
-            'zoom_range': 0.2
-        }
+    def create_train_test_tf_datasets(self):
+        self.train_ds = tf.data.Dataset.from_generator(lambda: self.train_generator,
+                                                       output_types=(tf.float32, tf.float32),
+                                                       output_shapes=([32,
+                                                                       parameters['image_params']['width'],
+                                                                       parameters['image_params']['height'], 3],
+                                                                      [32, ]))
+        self.val_ds = tf.data.Dataset.from_generator(lambda: self.val_generator,
+                                                     output_types=(tf.float32, tf.float32),
+                                                     output_shapes=([32,
+                                                                     parameters['image_params']['width'],
+                                                                     parameters['image_params']['height'], 3],
+                                                                    [32, ]))
+        self.test_ds = tf.data.Dataset.from_generator(lambda: self.test_generator,
+                                                      output_types=(tf.float32, tf.float32),
+                                                      output_shapes=([32,
+                                                                      parameters['image_params']['width'],
+                                                                      parameters['image_params']['height'], 3],
+                                                                     [32, ]))
 
-        config_test = {
-            "rescale": 1. / 255
-        }
+    def get_tf_datasets(self):
+        return self.train_ds, self.val_ds, self.test_ds
 
-        datagen = ImageDataGenerator(**config_train)
+    def create_train_test_generators(self):
+        logging.info('creating_generators')
+        train_datagen = ImageDataGenerator(**self.config['train'])
+        test_datagen = ImageDataGenerator(**self.config['test'])
+
+        self.train_generator = train_datagen.flow_from_directory(
+            IMAGE_PATH + paths['train'],
+            target_size=(parameters['image_params']['width'], parameters['image_params']['height']),
+            batch_size=32,
+            class_mode='binary',
+            subset='training'
+        )
+        self.val_generator = train_datagen.flow_from_directory(
+            IMAGE_PATH + paths['train'],
+            target_size=(parameters['image_params']['width'], parameters['image_params']['height']),
+            batch_size=32,
+            class_mode='binary',
+            subset='validation'
+        )
+        self.test_generator = test_datagen.flow_from_directory(
+            IMAGE_PATH + paths['test'],
+            target_size=(parameters['image_params']['width'], parameters['image_params']['height']),
+            batch_size=32,
+            class_mode='binary'
+        )
+        logging.info('generators_created')
 
     def get_generators(self):
-        pass
+        return self.train_generator, self.val_generator, self.test_generator
 
-    def get_images(self, load_from):
+    def get_images(self, load_from='nump'):
         if load_from == 'numpy':
             return self.load_from_npy()
         else:
             return self.load_images_from_dataframe()
 
 
-train_datagen = ImageDataGenerator(
-    rescale=1. / 255,
-    shear_range=0.2,
-    zoom_range=0.2)
-
-test_datagen = ImageDataGenerator(rescale=1. / 255)
-
-train_generator = train_datagen.flow_from_directory(
-    IMAGE_PATH + 'CASIA-HWDB_Train/Train',
-    target_size=(parameters['image_params']['width'], parameters['image_params']['height']),
-    batch_size=32,
-    class_mode='binary')
-
-validation_generator = test_datagen.flow_from_directory(
-    IMAGE_PATH + 'CASIA-HWDB_Test/Test',
-    target_size=(parameters['image_params']['width'], parameters['image_params']['height']),
-    batch_size=32,
-    class_mode='binary')
-
-# class HanziDataset(Sequence):
-#     def __init__(self, list_IDs, labels, image_path, mask_path,
-#                  to_fit=True, batch_size=32, dim=(256, 256),
-#                  n_channels=1, n_classes=10, shuffle=True):
-#         self.list_IDs = list_IDs
-#         self.labels = labels
-#         self.image_path = image_path
-#         self.mask_path = mask_path
-#         self.to_fit = to_fit
-#         self.batch_size = batch_size
-#         self.dim = dim
-#         self.n_channels = n_channels
-#         self.n_classes = n_classes
-#         self.shuffle = shuffle
-#         self.on_epoch_end()
-
+# vocab = os.listdir(IMAGE_PATH + paths["train"])
 
 # save_images_to_npy()
 if __name__ == '__main__':
-    labels, images = load_from_npy()
-    vocab = np.unique(labels)
-    vocab_layer = layers.StringLookup(vocabulary=vocab)
+    d = DataLoading()
+    d.create_train_test_generators()
+    train_generator, val_generator, test_generator = d.get_generators()
+
+    d.create_train_test_tf_datasets()
+    train_ds, val_ds, test_ds = d.get_tf_datasets()
+# labels, images = load_from_npy()
+# vocab = np.unique(labels)
+# vocab_layer = layers.StringLookup(vocabulary=vocab)

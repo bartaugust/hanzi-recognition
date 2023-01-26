@@ -19,6 +19,6 @@ def move_images(old_path, new_path, df_symbols):
             shutil.copytree(old_path + str(df_symbols.iloc[index, 0]), new_path + str(index))
 
 
-symbols = create_key_list(IMAGE_PATH + paths["or_train_data"])
-move_images(IMAGE_PATH + paths["or_train_data"], IMAGE_PATH + paths["train_data"], symbols)
-move_images(IMAGE_PATH + paths["or_test_data"], IMAGE_PATH + paths["test_data"], symbols)
+symbols = create_key_list(IMAGE_PATH + paths["or_train"])
+# move_images(IMAGE_PATH + paths["or_train_data"], IMAGE_PATH + paths["train_data"], symbols)
+move_images(IMAGE_PATH + paths["or_test"], IMAGE_PATH + paths["test"], symbols)
